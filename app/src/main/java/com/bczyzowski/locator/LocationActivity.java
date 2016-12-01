@@ -64,6 +64,7 @@ public class LocationActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+        moveTaskToBack(true);
     }
 
     @Override
@@ -119,4 +120,5 @@ public class LocationActivity extends AppCompatActivity
                 .position(new LatLng(0, 0))
                 .title("Marker"));
     }
+
 }
