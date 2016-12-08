@@ -12,6 +12,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bczyzowski.locator.model.User;
+import com.bczyzowski.locator.utils.HttpUtils;
+import com.bczyzowski.locator.utils.SharedPrefReadWrite;
+import com.loopj.android.http.BinaryHttpResponseHandler;
+
+import java.nio.charset.StandardCharsets;
+
+import cz.msebera.android.httpclient.Header;
+
 
 public class LoginActivity extends Activity {
     private static final String TAG = "LoginActivity";
@@ -44,6 +53,11 @@ public class LoginActivity extends Activity {
             }
         });
 
+        if(SharedPrefReadWrite.getUserFromSharedPref(getApplicationContext())!=null){
+            Intent intent = new Intent(getApplicationContext(), LocationActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
     }
 
@@ -71,15 +85,12 @@ public class LoginActivity extends Activity {
         progressDialog.show();
 
         //auth
-
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                signupSuccess();
+                authorization(emailText.getText().toString(),passwordText.getText().toString());
                 dismissProgressDialog();
-                Intent intent = new Intent(getApplicationContext(), LocationActivity.class);
-                startActivity(intent);
-                finish();
+
             }
         };
 
@@ -87,14 +98,34 @@ public class LoginActivity extends Activity {
         progressDialogHandler.postDelayed(runnable, 3000);
     }
 
-    private void signupSuccess() {
-        submit.setEnabled(true);
-    }
-
     private void signupFailed() {
         Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
         submit.setEnabled(true);
     }
+
+    private void authorization(final String email, final String password) {
+        HttpUtils.postLogin(getApplicationContext(), email, password, new BinaryHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] binaryData) {
+                String result = new String(binaryData, StandardCharsets.UTF_8);
+                User user = new User(email, password, result);
+                SharedPrefReadWrite.saveUserToSharedPref(user,getApplicationContext());
+                Log.d("asd", "---------------- this is response : " + result);
+                Intent intent = new Intent(getApplicationContext(), LocationActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] binaryData, Throwable error) {
+                signupFailed();
+            }
+        });
+
+    }
+
+
 
     private boolean validateInputData() {
         boolean result = true;
@@ -107,8 +138,8 @@ public class LoginActivity extends Activity {
         } else {
             emailText.setError(null);
         }
-        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
-            passwordText.setError("between 4 and 10 alphanumeric characters");
+        if (password.isEmpty() || password.length() < 3 || password.length() > 10) {
+            passwordText.setError("between 3 and 10 alphanumeric characters");
             result = false;
         } else {
             passwordText.setError(null);

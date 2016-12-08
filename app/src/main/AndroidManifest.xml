@@ -34,6 +34,17 @@
             android:value="AIzaSyAYeiPqy0HwJSYainAzh3xfuUpHgOUK-PM" />
 
         <activity android:name=".SignupActivity" android:theme="@style/AppTheme.Dark" />
+        <service android:name=".services.GpsService" />
+
+
+        <receiver
+            android:name=".receiver.StartGpsServiceAtBoot"
+            android:label="StartGpsServiceAtBoot">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
