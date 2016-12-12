@@ -15,13 +15,24 @@ import static android.content.Context.MODE_PRIVATE;
 public class SharedPrefReadWrite {
 
 
-    public static void saveUserToSharedPref(User user,Context context) {
+    public static void saveUserToSharedPref(User user,Context context,String[] firstAndLastName) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("user", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("userEmail", user.getEmail());
         editor.putString("userPassword", user.getPassword());
         editor.putString("userToken", user.getToken());
+        if(firstAndLastName.length>0){
+            editor.putString("firstName",firstAndLastName[0]);
+            editor.putString("lastName",firstAndLastName[1]);
+        }
         editor.commit();
+    }
+
+    public static String getUserFirstAndLastNameFromSharedPref(Context context){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("user", MODE_PRIVATE);
+        String firstName = sharedPreferences.getString("firstName","");
+        String lastName = sharedPreferences.getString("lastName","");
+        return new StringBuilder().append(firstName).append(" ").append(lastName).toString();
     }
 
     public static User getUserFromSharedPref(Context context) {

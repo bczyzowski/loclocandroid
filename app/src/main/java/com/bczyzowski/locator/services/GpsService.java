@@ -23,13 +23,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-/**
- * Created by Bartosz on 01.12.2016.
- */
+
 
 public class GpsService extends Service {
 
-    private long locTimeInterval = 10000;
+    private long locTimeInterval = 300000;
     private LocationListener locationListener;
     private LocationManager locationManager;
 
@@ -89,7 +87,7 @@ public class GpsService extends Service {
         //NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.mipmap.ic_highlight_off_black_24dp,"Disable").build();
 
         Notification notification = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.white)
                 .setContentTitle("LocLoc")
            //     .addAction(action)
                 .setContentIntent(pendingIntent).build();

@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -41,6 +43,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.vision.text.Text;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,7 +61,7 @@ public class LocationActivity extends AppCompatActivity
     private GoogleMap map;
     private Intent gpsService;
     private NavigationView navigationView;
-    private TextView navHeaderUserData;
+    private TextView navHeaderUserEmail, navHeaderUserFirstAndLastName;
     private User user;
     private List<String> friendsNames = new ArrayList<>();
     private List<Location> friendsLocations = new ArrayList<>();
@@ -71,7 +74,7 @@ public class LocationActivity extends AppCompatActivity
         setContentView(R.layout.activity_location);
         user = SharedPrefReadWrite.getUserFromSharedPref(getApplicationContext());
         updateUserFriendsList();
-
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         System.out.println("User in location activity : " + user);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -108,10 +111,11 @@ public class LocationActivity extends AppCompatActivity
     }
 
     private void setUserDataInNavHeader() {
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
         LinearLayout linearLayout = (LinearLayout) navigationView.getHeaderView(0);
-        navHeaderUserData = (TextView) linearLayout.getChildAt(2);
-        navHeaderUserData.setText(user.getEmail());
+        navHeaderUserFirstAndLastName = (TextView) linearLayout.getChildAt(1);
+        navHeaderUserEmail = (TextView) linearLayout.getChildAt(2);
+        navHeaderUserFirstAndLastName.setText(SharedPrefReadWrite.getUserFirstAndLastNameFromSharedPref(getApplicationContext()));
+        navHeaderUserEmail.setText(user.getEmail());
     }
 
     @Override
@@ -158,12 +162,17 @@ public class LocationActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        isMyLocationFocused = false;
+        if (id < friendsLocations.size()) {
+            isMyLocationFocused = false;
+            System.out.println("cliecked on : " + id);
+            Location location = friendsLocations.get(id);
+            updateLocOnMap(location.getLatitude(), location.getLongitude());
+        } else {
+            System.out.println("Clicked on add friend");
+            Intent intent = new Intent(getApplicationContext(),NewFriendActivity.class);
+            startActivity(intent);
+        }
 
-        System.out.println("cliecked on : " + id);
-
-        Location location = friendsLocations.get(id);
-        updateLocOnMap(location.getLatitude(), location.getLongitude());
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -178,13 +187,12 @@ public class LocationActivity extends AppCompatActivity
     private void updateLocOnMap(double lat, double lon) {
         map.clear();
         LatLng loc = new LatLng(lat, lon);
-        map.addMarker(new MarkerOptions().position(loc).title("Your actual position"));
+        map.addMarker(new MarkerOptions().position(loc).title("Last position"));
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16));
     }
 
-
     private void updateLocOnMap(double lat, double lon, float acc) {
-        if(lat !=0){
+        if (lat != 0) {
             map.clear();
             LatLng loc = new LatLng(lat, lon);
             CircleOptions circleOptions = new CircleOptions();
@@ -211,13 +219,15 @@ public class LocationActivity extends AppCompatActivity
             broadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
+                    System.out.println("Otrzymano loc");
                     double lastUserLat = intent.getExtras().getDouble("latitude");
                     double lastUserLon = intent.getExtras().getDouble("longitude");
                     float lastUserAcc = intent.getExtras().getFloat("accuracy");
                     System.out.println("new loc " + lastUserLat + " " + lastUserLon);
-                    if (isMyLocationFocused) updateLocOnMap(lastUserLat,lastUserLon,lastUserAcc);
-                    lastUserLocation = new Location(lastUserLat,lastUserLon,lastUserAcc);
-                    SharedPrefReadWrite.saveLastLocToSharedPref(lastUserLocation,getApplicationContext());
+                    if (isMyLocationFocused) updateLocOnMap(lastUserLat, lastUserLon, lastUserAcc);
+                    lastUserLocation = new Location(lastUserLat, lastUserLon, lastUserAcc);
+                    SharedPrefReadWrite.saveLastLocToSharedPref(lastUserLocation, getApplicationContext());
+                    sendLocationToServer(lastUserLocation);
                 }
             };
         }
@@ -270,22 +280,68 @@ public class LocationActivity extends AppCompatActivity
     }
 
     private void goBackToMyOwnLocation() {
+
+        final LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationListener actualListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(android.location.Location location) {
+                Location loc = new Location(location.getLatitude(), location.getLongitude(), location.getAccuracy());
+                mlocManager.removeUpdates(this);
+                SharedPrefReadWrite.saveLastLocToSharedPref(loc, getApplicationContext());
+                sendLocationToServer(loc);
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+
+        if (mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, actualListener);
+        }
+
         isMyLocationFocused = true;
-        getLocationFromBroadcast();
         restoreLastSavedLocation();
     }
 
-    private void restoreLastSavedLocation(){
+    private void restoreLastSavedLocation() {
         lastUserLocation = SharedPrefReadWrite.getLastLocToSharedPref(getApplicationContext());
-        if(lastUserLocation!=null){
-            updateLocOnMap(lastUserLocation.getLatitude(),lastUserLocation.getLongitude(),lastUserLocation.getAccuracy());
+        if (lastUserLocation != null) {
+            updateLocOnMap(lastUserLocation.getLatitude(), lastUserLocation.getLongitude(), lastUserLocation.getAccuracy());
         }
     }
 
     private void createFriendsSubmenu() {
-        SubMenu friends = navigationView.getMenu().addSubMenu("Friends");
+        int index = 0;
         for (String name : friendsNames) {
-            friends.add(name);
+            navigationView.getMenu().add(0,index++,Menu.NONE,name);
+
         }
+        navigationView.getMenu().add(0,index,Menu.NONE,"New friend");
+    }
+
+    private void sendLocationToServer(Location location) {
+        HttpUtils.postLocation(getApplicationContext(), user, location, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Toast.makeText(getApplicationContext(), "Location not saved", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Toast.makeText(getApplicationContext(), "Location saved", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

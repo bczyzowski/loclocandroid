@@ -31,11 +31,13 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAYeiPqy0HwJSYainAzh3xfuUpHgOUK-PM" />
+            android:value="AIzaSyAHbxuIjOAuiwUjiX75_futqqgPIdcOe3U" />
 
-        <activity android:name=".SignupActivity" android:theme="@style/AppTheme.Dark" />
+        <activity
+            android:name=".SignupActivity"
+            android:theme="@style/AppTheme.Dark" />
+
         <service android:name=".services.GpsService" />
-
 
         <receiver
             android:name=".receiver.StartGpsServiceAtBoot"
@@ -45,6 +47,7 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name=".NewFriendActivity"></activity>
     </application>
 
 </manifest>

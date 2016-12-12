@@ -16,6 +16,10 @@ import com.bczyzowski.locator.model.User;
 import com.bczyzowski.locator.utils.HttpUtils;
 import com.bczyzowski.locator.utils.SharedPrefReadWrite;
 import com.loopj.android.http.BinaryHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 
@@ -104,21 +108,34 @@ public class LoginActivity extends Activity {
     }
 
     private void authorization(final String email, final String password) {
-        HttpUtils.postLogin(getApplicationContext(), email, password, new BinaryHttpResponseHandler() {
+        HttpUtils.postLogin(getApplicationContext(), email, password, new JsonHttpResponseHandler() {
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] binaryData) {
-                String result = new String(binaryData, StandardCharsets.UTF_8);
-                User user = new User(email, password, result);
-                SharedPrefReadWrite.saveUserToSharedPref(user,getApplicationContext());
-                Log.d("asd", "---------------- this is response : " + result);
+            public void onSuccess(int statusCode, Header[] headers, JSONObject jsonObject) {
+                //String result = new String(binaryData, StandardCharsets.UTF_8);
+
+                System.out.println("rec json: "+jsonObject.toString());
+
+                try {
+                    String token = jsonObject.getString("token");
+                    String firstName = jsonObject.getString("firstName");
+                    String lastName = jsonObject.getString("lastName");
+
+
+                    User user = new User(email, password, token);
+                    SharedPrefReadWrite.saveUserToSharedPref(user,getApplicationContext(),new String[]{firstName,lastName});
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+             //   Log.d("asd", "---------------- this is response : " + token);
                 Intent intent = new Intent(getApplicationContext(), LocationActivity.class);
                 startActivity(intent);
                 finish();
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] binaryData, Throwable error) {
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 signupFailed();
             }
         });
