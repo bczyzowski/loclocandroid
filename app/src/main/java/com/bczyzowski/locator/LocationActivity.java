@@ -45,6 +45,8 @@ import com.google.android.gms.vision.text.Text;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -191,7 +193,7 @@ public class LocationActivity extends AppCompatActivity
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16));
     }
 
-    private void updateLocOnMap(double lat, double lon, float acc) {
+    private void updateLocOnMap(double lat, double lon, float acc,LocalDateTime time) {
         if (lat != 0) {
             map.clear();
             LatLng loc = new LatLng(lat, lon);
@@ -199,7 +201,7 @@ public class LocationActivity extends AppCompatActivity
             circleOptions.center(loc);
             circleOptions.radius(acc);
             circleOptions.fillColor(Color.BLUE);
-            map.addMarker(new MarkerOptions().position(loc).title("Your actual position"));
+            map.addMarker(new MarkerOptions().position(loc).title("Your last position").snippet(time.toString())).showInfoWindow();
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16));
             map.addCircle(circleOptions);
         }
@@ -223,9 +225,10 @@ public class LocationActivity extends AppCompatActivity
                     double lastUserLat = intent.getExtras().getDouble("latitude");
                     double lastUserLon = intent.getExtras().getDouble("longitude");
                     float lastUserAcc = intent.getExtras().getFloat("accuracy");
+                    LocalDateTime time = (LocalDateTime) intent.getExtras().get("time");
                     System.out.println("new loc " + lastUserLat + " " + lastUserLon);
-                    if (isMyLocationFocused) updateLocOnMap(lastUserLat, lastUserLon, lastUserAcc);
-                    lastUserLocation = new Location(lastUserLat, lastUserLon, lastUserAcc);
+                    if (isMyLocationFocused) updateLocOnMap(lastUserLat, lastUserLon, lastUserAcc,time);
+                    lastUserLocation = new Location(lastUserLat, lastUserLon, lastUserAcc,time);
                     SharedPrefReadWrite.saveLastLocToSharedPref(lastUserLocation, getApplicationContext());
                     sendLocationToServer(lastUserLocation);
                 }
@@ -263,13 +266,12 @@ public class LocationActivity extends AppCompatActivity
                         System.out.println(jsonObject.get("latitude"));
                         System.out.println(jsonObject.get("longitude"));
                         friendsNames.add(jsonObject.getString("name"));
-                        friendsLocations.add(new Location(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude")));
+                        friendsLocations.add(new Location(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"),Float.valueOf(jsonObject.get("accuracy").toString()), LocalDateTime.parse(String.valueOf(jsonObject.get("time")))));
                     }
                     createFriendsSubmenu();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
 
             @Override
@@ -285,7 +287,7 @@ public class LocationActivity extends AppCompatActivity
         LocationListener actualListener = new LocationListener() {
             @Override
             public void onLocationChanged(android.location.Location location) {
-                Location loc = new Location(location.getLatitude(), location.getLongitude(), location.getAccuracy());
+                Location loc = new Location(location.getLatitude(), location.getLongitude(), location.getAccuracy(),new DateTime().toLocalDateTime());
                 mlocManager.removeUpdates(this);
                 SharedPrefReadWrite.saveLastLocToSharedPref(loc, getApplicationContext());
                 sendLocationToServer(loc);
@@ -318,7 +320,7 @@ public class LocationActivity extends AppCompatActivity
     private void restoreLastSavedLocation() {
         lastUserLocation = SharedPrefReadWrite.getLastLocToSharedPref(getApplicationContext());
         if (lastUserLocation != null) {
-            updateLocOnMap(lastUserLocation.getLatitude(), lastUserLocation.getLongitude(), lastUserLocation.getAccuracy());
+            updateLocOnMap(lastUserLocation.getLatitude(), lastUserLocation.getLongitude(), lastUserLocation.getAccuracy(),lastUserLocation.getTime());
         }
     }
 

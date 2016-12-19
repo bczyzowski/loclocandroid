@@ -25,13 +25,14 @@ public class HttpUtils {
 
 
     //physical device
-    /*public static final String URL_LOGIN = "http://192.168.1.109:8080/Locator/api/user";
-    public static final String URL_LOCATION = "http://192.168.1.109:8080/Locator/api/location/send";
-    public static final String URL_GETFRIENDS = "http://192.168.1.109:8080/Locator/api/user/friends";
-    public static final String URL_REGISTER = "http://192.168.1.109:8080/Locator/api/user/register";
-    public static final String NEW_FRIEND = "http://192.168.1.109:8080/Locator/api/user/newfriend";
+/*
+    public static final String URL_LOGIN = "http://192.168.1.106:8080/Locator/api/user";
+    public static final String URL_LOCATION = "http://192.168.1.106:8080/Locator/api/location/send";
+    public static final String URL_GETFRIENDS = "http://192.168.1.106:8080/Locator/api/user/friends";
+    public static final String URL_REGISTER = "http://192.168.1.106:8080/Locator/api/user/register";
+    public static final String NEW_FRIEND = "http://192.168.1.106:8080/Locator/api/user/newfriend";
 
-    */
+*/
 
 
     private static AsyncHttpClient client = new AsyncHttpClient();
@@ -59,6 +60,8 @@ public class HttpUtils {
             jsonObject.put("longitude", location.getLongitude());
             jsonObject.put("email", user.getEmail());
             jsonObject.put("authToken", user.getToken());
+            jsonObject.put("time",location.getTime().toString());
+            jsonObject.put("accuracy",location.getAccuracy());
             StringEntity entity = new StringEntity(jsonObject.toString());
             client.post(context, URL_LOCATION, entity, "application/json", responseHandler);
         } catch (JSONException e) {

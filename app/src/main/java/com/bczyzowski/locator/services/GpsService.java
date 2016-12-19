@@ -16,9 +16,16 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.bczyzowski.locator.R;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
+import org.joda.time.DateTime;
+
+import java.sql.Time;
+import java.util.Date;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -27,7 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class GpsService extends Service {
 
-    private long locTimeInterval = 300000;
+    private long locTimeInterval = 30000;
     private LocationListener locationListener;
     private LocationManager locationManager;
 
@@ -43,6 +50,7 @@ public class GpsService extends Service {
 
     @Override
     public void onCreate() {
+        JodaTimeAndroid.init(getApplicationContext());
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -51,6 +59,7 @@ public class GpsService extends Service {
                 intent.putExtra("longitude", location.getLongitude());
                 intent.putExtra("latitude", location.getLatitude());
                 intent.putExtra("accuracy", location.getAccuracy());
+                intent.putExtra("time",new DateTime().toLocalDateTime());
                 sendBroadcast(intent);
             }
 

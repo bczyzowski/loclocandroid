@@ -6,11 +6,10 @@ import android.content.SharedPreferences;
 import com.bczyzowski.locator.model.Location;
 import com.bczyzowski.locator.model.User;
 
+import org.joda.time.LocalDateTime;
+
 import static android.content.Context.MODE_PRIVATE;
 
-/**
- * Created by bczyz on 05.12.2016.
- */
 
 public class SharedPrefReadWrite {
 
@@ -25,14 +24,14 @@ public class SharedPrefReadWrite {
             editor.putString("firstName",firstAndLastName[0]);
             editor.putString("lastName",firstAndLastName[1]);
         }
-        editor.commit();
+        editor.apply();
     }
 
     public static String getUserFirstAndLastNameFromSharedPref(Context context){
         SharedPreferences sharedPreferences = context.getSharedPreferences("user", MODE_PRIVATE);
         String firstName = sharedPreferences.getString("firstName","");
         String lastName = sharedPreferences.getString("lastName","");
-        return new StringBuilder().append(firstName).append(" ").append(lastName).toString();
+        return firstName + " " + lastName;
     }
 
     public static User getUserFromSharedPref(Context context) {
@@ -41,8 +40,7 @@ public class SharedPrefReadWrite {
         if (!email.equals("")) {
             String password = sharedPreferences.getString("userPassword", "");
             String token = sharedPreferences.getString("userToken", "");
-            User user = new User(email, password, token);
-            return user;
+            return new User(email, password, token);
         } else {
             return null;
         }
@@ -54,7 +52,8 @@ public class SharedPrefReadWrite {
         editor.putString("latitude",String.valueOf(location.getLatitude()));
         editor.putString("longitude",String.valueOf(location.getLongitude()));
         editor.putString("accuracy",String.valueOf(location.getAccuracy()));
-        editor.commit();
+        editor.putString("time",location.getTime().toString());
+        editor.apply();
     }
 
     public static Location getLastLocToSharedPref(Context context) {
@@ -63,8 +62,8 @@ public class SharedPrefReadWrite {
         if(!latitude.equals("")){
             String longitude = sharedPreferences.getString("longitude","");
             String accuracy = sharedPreferences.getString("accuracy","");
-            Location lastLocation = new Location(Double.valueOf(latitude),Double.valueOf(longitude),Float.valueOf(accuracy));
-            return lastLocation;
+            LocalDateTime time= LocalDateTime.parse(sharedPreferences.getString("time",""));
+            return new Location(Double.valueOf(latitude),Double.valueOf(longitude),Float.valueOf(accuracy),time);
         }else{
             return null;
         }

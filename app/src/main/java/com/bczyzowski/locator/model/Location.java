@@ -1,39 +1,32 @@
 package com.bczyzowski.locator.model;
 
-/**
- * Created by bczyz on 23.09.2016.
- */
+
+import org.joda.time.LocalDateTime;
 
 public class Location {
 
     private double latitude, longitude;
     private float accuracy;
+    private LocalDateTime time;
 
-    public Location(double latitude, double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
 
-    public Location(double latitude, double longitude, float accuracy) {
+    public Location(double latitude, double longitude, float accuracy, LocalDateTime time) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.accuracy = accuracy;
+        this.time = time;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
+    public LocalDateTime getTime() {
+        return time;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
+    public void setTime(LocalDateTime time) {
+        this.time = time;
     }
 
     public float getAccuracy() {
         return accuracy;
-    }
-
-    public void setAccuracy(float accuracy) {
-        this.accuracy = accuracy;
     }
 
     public double getLatitude() {

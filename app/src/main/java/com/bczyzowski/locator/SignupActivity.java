@@ -73,9 +73,6 @@ public class SignupActivity extends Activity {
                     finish();
                 }
             });
-
-
-            Toast.makeText(getBaseContext(), "Signup OK", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(getBaseContext(), "Signup !OK", Toast.LENGTH_LONG).show();
         }
