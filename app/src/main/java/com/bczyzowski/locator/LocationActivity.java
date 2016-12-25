@@ -1,6 +1,5 @@
 package com.bczyzowski.locator;
 
-import android.*;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,9 +12,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.view.SubMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -41,7 +38,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.vision.text.Text;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
@@ -159,7 +155,6 @@ public class LocationActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -200,7 +195,7 @@ public class LocationActivity extends AppCompatActivity
             CircleOptions circleOptions = new CircleOptions();
             circleOptions.center(loc);
             circleOptions.radius(acc);
-            circleOptions.fillColor(Color.BLUE);
+            circleOptions.fillColor(Color.rgb(128,209,255));
             map.addMarker(new MarkerOptions().position(loc).title("Your last position").snippet(time.toString())).showInfoWindow();
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16));
             map.addCircle(circleOptions);
@@ -256,6 +251,9 @@ public class LocationActivity extends AppCompatActivity
     private void updateUserFriendsList() {
         friendsNames.clear();
         friendsLocations.clear();
+
+
+
         HttpUtils.getUserFriends(this, user, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -290,6 +288,7 @@ public class LocationActivity extends AppCompatActivity
                 Location loc = new Location(location.getLatitude(), location.getLongitude(), location.getAccuracy(),new DateTime().toLocalDateTime());
                 mlocManager.removeUpdates(this);
                 SharedPrefReadWrite.saveLastLocToSharedPref(loc, getApplicationContext());
+                restoreLastSavedLocation();
                 sendLocationToServer(loc);
             }
 
@@ -312,9 +311,7 @@ public class LocationActivity extends AppCompatActivity
         if (mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, actualListener);
         }
-
         isMyLocationFocused = true;
-        restoreLastSavedLocation();
     }
 
     private void restoreLastSavedLocation() {

@@ -3,6 +3,7 @@ package com.bczyzowski.locator;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +19,7 @@ import com.bczyzowski.locator.utils.SharedPrefReadWrite;
 import com.loopj.android.http.BinaryHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -57,7 +59,7 @@ public class LoginActivity extends Activity {
             }
         });
 
-        if(SharedPrefReadWrite.getUserFromSharedPref(getApplicationContext())!=null){
+        if (SharedPrefReadWrite.getUserFromSharedPref(getApplicationContext()) != null) {
             Intent intent = new Intent(getApplicationContext(), LocationActivity.class);
             startActivity(intent);
             finish();
@@ -73,7 +75,7 @@ public class LoginActivity extends Activity {
 
     private void login() {
 
-        Log.d(TAG,"Login");
+        Log.d(TAG, "Login");
 
         //checking input data
         if (!validateInputData()) {
@@ -86,20 +88,16 @@ public class LoginActivity extends Activity {
         progressDialog = new ProgressDialog(LoginActivity.this, R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating ...");
-        progressDialog.show();
 
-        //auth
+
+        // invoking auth
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                authorization(emailText.getText().toString(),passwordText.getText().toString());
-                dismissProgressDialog();
-
+                authorization(emailText.getText().toString(), passwordText.getText().toString());
             }
         };
-
-        Handler progressDialogHandler = new Handler();
-        progressDialogHandler.postDelayed(runnable, 3000);
+        runnable.run();
     }
 
     private void signupFailed() {
@@ -108,41 +106,34 @@ public class LoginActivity extends Activity {
     }
 
     private void authorization(final String email, final String password) {
+        progressDialog.show();
         HttpUtils.postLogin(getApplicationContext(), email, password, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject jsonObject) {
-                //String result = new String(binaryData, StandardCharsets.UTF_8);
-
-                System.out.println("rec json: "+jsonObject.toString());
-
                 try {
                     String token = jsonObject.getString("token");
                     String firstName = jsonObject.getString("firstName");
                     String lastName = jsonObject.getString("lastName");
-
-
                     User user = new User(email, password, token);
-                    SharedPrefReadWrite.saveUserToSharedPref(user,getApplicationContext(),new String[]{firstName,lastName});
+                    SharedPrefReadWrite.saveUserToSharedPref(user, getApplicationContext(), new String[]{firstName, lastName});
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-             //   Log.d("asd", "---------------- this is response : " + token);
+                dismissProgressDialog();
                 Intent intent = new Intent(getApplicationContext(), LocationActivity.class);
                 startActivity(intent);
                 finish();
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                dismissProgressDialog();
                 signupFailed();
             }
         });
 
     }
-
-
 
     private boolean validateInputData() {
         boolean result = true;
@@ -169,4 +160,6 @@ public class LoginActivity extends Activity {
             progressDialog.dismiss();
         }
     }
+
+
 }

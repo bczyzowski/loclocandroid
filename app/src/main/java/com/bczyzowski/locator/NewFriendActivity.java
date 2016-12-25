@@ -37,7 +37,7 @@ public class NewFriendActivity extends Activity {
                     HttpUtils.addNewFriend(getApplicationContext(), userEmail, email, new TextHttpResponseHandler() {
                         @Override
                         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                            Toast.makeText(getApplicationContext(), "Try again", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Try another e-mail", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override

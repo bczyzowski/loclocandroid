@@ -17,22 +17,27 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 public class HttpUtils {
 
     //emulator
-    public static final String URL_LOGIN = "http://10.0.2.2:8080/Locator/api/user";
-    public static final String URL_LOCATION = "http://10.0.2.2:8080/Locator/api/location/send";
-    public static final String URL_GETFRIENDS = "http://10.0.2.2:8080/Locator/api/user/friends";
-    public static final String URL_REGISTER = "http://10.0.2.2:8080/Locator/api/user/register";
-    public static final String NEW_FRIEND = "http://10.0.2.2:8080/Locator/api/user/newfriend";
-
+  /*  public static final String URL_LOGIN = "http://10.0.2.2:8080/locloc/api/user";
+    public static final String URL_LOCATION = "http://10.0.2.2:8080/locloc/api/location/send";
+    public static final String URL_GETFRIENDS = "http://10.0.2.2:8080/locloc/api/user/friends";
+    public static final String URL_REGISTER = "http://10.0.2.2:8080/locloc/api/user/register";
+    public static final String NEW_FRIEND = "http://10.0.2.2:8080/locloc/api/user/newfriend";*/
 
     //physical device
 /*
-    public static final String URL_LOGIN = "http://192.168.1.106:8080/Locator/api/user";
-    public static final String URL_LOCATION = "http://192.168.1.106:8080/Locator/api/location/send";
-    public static final String URL_GETFRIENDS = "http://192.168.1.106:8080/Locator/api/user/friends";
-    public static final String URL_REGISTER = "http://192.168.1.106:8080/Locator/api/user/register";
-    public static final String NEW_FRIEND = "http://192.168.1.106:8080/Locator/api/user/newfriend";
-
+    public static final String URL_LOGIN = "http://192.168.1.108:8080/locloc/api/user";
+    public static final String URL_LOCATION = "http://192.168.1.108:8080/locloc/api/location/send";
+    public static final String URL_GETFRIENDS = "http://192.168.1.108:8080/locloc/api/user/friends";
+    public static final String URL_REGISTER = "http://192.168.1.108:8080/locloc/api/user/register";
+    public static final String NEW_FRIEND = "http://192.168.1.108:8080/locloc/api/user/newfriend";
 */
+
+    //server
+    public static final String URL_LOGIN = "http://79.137.36.192:8080/locloc/api/user";
+    public static final String URL_LOCATION = "http://79.137.36.192:8080/locloc/api/location/send";
+    public static final String URL_GETFRIENDS = "http://79.137.36.192:8080/locloc/api/user/friends";
+    public static final String URL_REGISTER = "http://79.137.36.192:8080/locloc/api/user/register";
+    public static final String NEW_FRIEND = "http://79.137.36.192:8080/locloc/api/user/newfriend";
 
 
     private static AsyncHttpClient client = new AsyncHttpClient();
@@ -44,7 +49,7 @@ public class HttpUtils {
             jsonObject.put("email", email);
             jsonObject.put("password", password);
             StringEntity entity = new StringEntity(jsonObject.toString());
-            client.setResponseTimeout(3000);
+            client.setResponseTimeout(5000);
             client.post(context, URL_LOGIN, entity, "application/json", responseHandler);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -77,7 +82,6 @@ public class HttpUtils {
         try {
             jsonObject.put("email", user.getEmail());
             jsonObject.put("token", user.getToken());
-            jsonObject.put("password", user.getPassword());
             StringEntity entity = new StringEntity(jsonObject.toString());
             client.post(context, URL_GETFRIENDS, entity, "application/json", responseHandler);
         } catch (JSONException e) {

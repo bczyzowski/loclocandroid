@@ -96,12 +96,24 @@ public class SignupActivity extends Activity {
             passwordText1.setError("redefine password");
             result = false;
         }
+        if (password.length()<5) {
+            passwordText1.setError("5 characters minimum");
+            result = false;
+        }
         if (firstName.isEmpty()) {
             firstNameText.setError("first name can't be empty");
             result = false;
         }
         if (lastName.isEmpty()) {
             lastNameText.setError("last name can't be empty");
+            result = false;
+        }
+        if(!(lastName.length()>3 && lastName.length() <20) ){
+            lastNameText.setError("3 to 20 characters");
+            result = false;
+        }
+        if(!(firstName.length()>3 && firstName.length() <20) ){
+            firstNameText.setError("3 to 20 characters");
             result = false;
         }
 

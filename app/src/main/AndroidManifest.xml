@@ -13,7 +13,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/white"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Dark">
@@ -31,7 +31,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAHbxuIjOAuiwUjiX75_futqqgPIdcOe3U" />
+            android:value="AIzaSyDyg5CdFQuszAU2H6ZNF7RHbb_FBUtWlsg" />
 
         <activity
             android:name=".SignupActivity"

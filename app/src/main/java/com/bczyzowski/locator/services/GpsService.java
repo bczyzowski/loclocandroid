@@ -34,7 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class GpsService extends Service {
 
-    private long locTimeInterval = 30000;
+    private long locTimeInterval = 600000;
     private LocationListener locationListener;
     private LocationManager locationManager;
 
