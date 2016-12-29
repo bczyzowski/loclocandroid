@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<!--
     <color name="primary">#E43F3F</color>
     <color name="primary_dark">#E12929</color>
     <color name="primary_darker">#CC1D1D</color>
@@ -14,4 +15,17 @@
     <color name="base">#AAAAAA</color>
     <color name="iron">#CCCCCC</color>
     <color name="white">#FFFFFF</color>
+
+-->
+
+    <color name="primary">#777</color>
+    <color name="primary_dark">#a6a1a1</color>
+    <color name="primary_darker">#a6a1a1</color>
+    <color name="textColorPrimary">#777</color>
+    <color name="textColor">#777</color>
+    <color name="white">#FFFFFF</color>
+    <color name="accent">#FFFFFF</color>
+
+
+
 </resources>

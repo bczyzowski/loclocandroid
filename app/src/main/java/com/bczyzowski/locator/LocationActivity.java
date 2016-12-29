@@ -161,9 +161,10 @@ public class LocationActivity extends AppCompatActivity
 
         if (id < friendsLocations.size()) {
             isMyLocationFocused = false;
-            System.out.println("cliecked on : " + id);
+            System.out.println("clicked on : " + id);
             Location location = friendsLocations.get(id);
-            updateLocOnMap(location.getLatitude(), location.getLongitude());
+            if(location!=null)updateLocOnMap(location.getLatitude(), location.getLongitude());
+            else Toast.makeText(getApplicationContext(),"No location available for this user",Toast.LENGTH_SHORT).show();
         } else {
             System.out.println("Clicked on add friend");
             Intent intent = new Intent(getApplicationContext(),NewFriendActivity.class);
@@ -264,7 +265,11 @@ public class LocationActivity extends AppCompatActivity
                         System.out.println(jsonObject.get("latitude"));
                         System.out.println(jsonObject.get("longitude"));
                         friendsNames.add(jsonObject.getString("name"));
-                        friendsLocations.add(new Location(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"),Float.valueOf(jsonObject.get("accuracy").toString()), LocalDateTime.parse(String.valueOf(jsonObject.get("time")))));
+                        if(!jsonObject.getString("latitude").isEmpty()){
+                            friendsLocations.add(new Location(Double.valueOf(jsonObject.getString("latitude")), Double.valueOf(jsonObject.getString("longitude")),Float.valueOf(jsonObject.getString("accuracy")), LocalDateTime.parse(String.valueOf(jsonObject.getString("time")))));
+                        }else{
+                            friendsLocations.add(null);
+                        }
                     }
                     createFriendsSubmenu();
                 } catch (JSONException e) {
