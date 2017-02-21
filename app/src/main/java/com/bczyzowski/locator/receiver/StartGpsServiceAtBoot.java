@@ -6,9 +6,7 @@ import android.content.Intent;
 
 import com.bczyzowski.locator.services.GpsService;
 
-/**
- * Created by bczyz on 05.12.2016.
- */
+
 
 public class StartGpsServiceAtBoot extends BroadcastReceiver {
     @Override

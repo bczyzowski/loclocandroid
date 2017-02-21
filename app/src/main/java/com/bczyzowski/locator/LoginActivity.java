@@ -88,6 +88,7 @@ public class LoginActivity extends Activity {
         progressDialog = new ProgressDialog(LoginActivity.this, R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating ...");
+        progressDialog.setCancelable(false);
 
 
         // invoking auth
@@ -146,8 +147,8 @@ public class LoginActivity extends Activity {
         } else {
             emailText.setError(null);
         }
-        if (password.isEmpty() || password.length() < 3 || password.length() > 10) {
-            passwordText.setError("between 3 and 10 alphanumeric characters");
+        if (password.isEmpty() || password.length() < 5) {
+            passwordText.setError("minimum 5 alphanumeric characters");
             result = false;
         } else {
             passwordText.setError(null);

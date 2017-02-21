@@ -1,35 +1,25 @@
 package com.bczyzowski.locator.services;
 
 
-import android.Manifest;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.Icon;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.bczyzowski.locator.R;
+import com.bczyzowski.locator.model.User;
+import com.bczyzowski.locator.utils.SharedPrefReadWrite;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-import org.joda.time.DateTime;
-
-import java.sql.Time;
-import java.util.Date;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-
+import org.joda.time.LocalDateTime;
 
 
 public class GpsService extends Service {
@@ -37,6 +27,7 @@ public class GpsService extends Service {
     private long locTimeInterval = 600000;
     private LocationListener locationListener;
     private LocationManager locationManager;
+    private User user;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -45,6 +36,7 @@ public class GpsService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        user = SharedPrefReadWrite.getUserFromSharedPref(getApplication());
         return START_STICKY;
     }
 
@@ -55,12 +47,14 @@ public class GpsService extends Service {
             @Override
             public void onLocationChanged(Location location) {
                 System.out.println("Zmiana lokalizacji " + location.getLongitude() + " " + location.getLatitude());
+                com.bczyzowski.locator.model.Location loc = new com.bczyzowski.locator.model.Location(location.getLatitude(), location.getLongitude(), location.getAccuracy(), LocalDateTime.now());
+                SharedPrefReadWrite.saveLastLocToSharedPref(loc, getApplicationContext());
                 Intent intent = new Intent("locationUpdate");
-                intent.putExtra("longitude", location.getLongitude());
-                intent.putExtra("latitude", location.getLatitude());
-                intent.putExtra("accuracy", location.getAccuracy());
-                intent.putExtra("time",new DateTime().toLocalDateTime());
                 sendBroadcast(intent);
+
+                Intent locServiceIntent = new Intent(getBaseContext(),LocationSenderService.class);
+                locServiceIntent.putExtra("loc", loc);
+                startService(locServiceIntent);
             }
 
             @Override
@@ -82,7 +76,7 @@ public class GpsService extends Service {
         };
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, locTimeInterval, 1, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, locTimeInterval, 3, locationListener);
 
 
         Intent notificationIntent = new Intent(getApplicationContext(), com.bczyzowski.locator.LocationActivity.class);
@@ -92,18 +86,13 @@ public class GpsService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                 notificationIntent, 0);
 
-
-        //NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.mipmap.ic_highlight_off_black_24dp,"Disable").build();
-
         Notification notification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.white)
                 .setContentTitle("LocLoc")
-           //     .addAction(action)
                 .setContentIntent(pendingIntent).build();
 
         startForeground(666, notification);
     }
-
 
 
     @Override

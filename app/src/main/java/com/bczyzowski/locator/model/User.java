@@ -2,9 +2,6 @@ package com.bczyzowski.locator.model;
 
 import java.io.Serializable;
 
-/**
- * Created by bczyz on 23.09.2016.
- */
 
 public class User implements Serializable{
 

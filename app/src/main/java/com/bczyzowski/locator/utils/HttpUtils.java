@@ -17,28 +17,28 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 public class HttpUtils {
 
     //emulator
-    public static final String URL_LOGIN = "http://10.0.2.2:8080/locloc/api/user";
+   /* public static final String URL_LOGIN = "http://10.0.2.2:8080/locloc/api/user";
     public static final String URL_LOCATION = "http://10.0.2.2:8080/locloc/api/location/send";
     public static final String URL_GETFRIENDS = "http://10.0.2.2:8080/locloc/api/user/friends";
     public static final String URL_REGISTER = "http://10.0.2.2:8080/locloc/api/user/register";
     public static final String NEW_FRIEND = "http://10.0.2.2:8080/locloc/api/user/newfriend";
+    public static final String HISTORY = "http://10.0.2.2:8080/locloc/api/location/history";*/
 
     //physical device
-/*
-    public static final String URL_LOGIN = "http://192.168.1.108:8080/locloc/api/user";
-    public static final String URL_LOCATION = "http://192.168.1.108:8080/locloc/api/location/send";
-    public static final String URL_GETFRIENDS = "http://192.168.1.108:8080/locloc/api/user/friends";
-    public static final String URL_REGISTER = "http://192.168.1.108:8080/locloc/api/user/register";
-    public static final String NEW_FRIEND = "http://192.168.1.108:8080/locloc/api/user/newfriend";
-*/
+   /* public static final String URL_LOGIN = "http://192.168.1.106:8080/locloc/api/user";
+    public static final String URL_LOCATION = "http://192.168.1.106:8080/locloc/api/location/send";
+    public static final String URL_GETFRIENDS = "http://192.168.1.106:8080/locloc/api/user/friends";
+    public static final String URL_REGISTER = "http://192.168.1.106:8080/locloc/api/user/register";
+    public static final String NEW_FRIEND = "http://192.168.1.106:8080/locloc/api/user/newfriend";
+    public static final String HISTORY = "http://192.168.1.106:8080/locloc/api/location/history";*/
 
     //server
-   /* public static final String URL_LOGIN = "http://79.137.36.192:8080/locloc/api/user";
+    public static final String URL_LOGIN = "http://79.137.36.192:8080/locloc/api/user";
     public static final String URL_LOCATION = "http://79.137.36.192:8080/locloc/api/location/send";
     public static final String URL_GETFRIENDS = "http://79.137.36.192:8080/locloc/api/user/friends";
     public static final String URL_REGISTER = "http://79.137.36.192:8080/locloc/api/user/register";
-    public static final String NEW_FRIEND = "http://79.137.36.192:8080/locloc/api/user/newfriend";*/
-
+    public static final String NEW_FRIEND = "http://79.137.36.192:8080/locloc/api/user/newfriend";
+    public static final String HISTORY = "http://79.137.36.192:8080/locloc/api/location/history";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -120,5 +120,21 @@ public class HttpUtils {
             e.printStackTrace();
         }
 
+    }
+
+    public static void retrieveHistory(Context context, String userEmail, String friendEmail,String token, int day,int month,int year, AsyncHttpResponseHandler responseHandler){
+        JSONObject jsonObject = new JSONObject();
+        try{
+            jsonObject.put("email",userEmail);
+            jsonObject.put("friendEmail",friendEmail);
+            jsonObject.put("token",token);
+            jsonObject.put("day",day);
+            jsonObject.put("month",month);
+            jsonObject.put("year",year);
+            StringEntity entity = new StringEntity(jsonObject.toString());
+            client.post(context, HISTORY, entity, "application/json", responseHandler);
+        }catch (JSONException e){} catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 }
