@@ -35,7 +35,7 @@ public class LocationPickerDialogFragment extends DialogFragment {
             locations[0] = "Show all";
             for (int i = 0; i < data.length(); i++) {
                 JSONObject object = data.getJSONObject(i);
-                LocalDateTime time = LocalDateTime.parse(object.getString("date"));
+                LocalDateTime time = LocalDateTime.parse(object.getString("time"));
                 locations[i + 1] = time.toString();
                 retrievedLocations.add(new Location(object.getDouble("lat"), object.getDouble("lon"), 0, time));
             }

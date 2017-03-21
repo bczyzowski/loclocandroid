@@ -17,6 +17,7 @@ import com.bczyzowski.locator.utils.TinyDB;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -51,8 +52,12 @@ public class LocationSenderService extends IntentService {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    sendLocations();
-                    sendLocationToServer(location);
+                    if (locationList.size() > 0) {
+                        sendAllLocationsToServer();
+                    } else {
+                        sendLocationToServer(location);
+                    }
+
                 }
             });
         } else {
@@ -92,6 +97,23 @@ public class LocationSenderService extends IntentService {
                 Log.d("locsend", "succ - loc rem");
                 Log.d("locsend", location.toString());
                 Log.d("locsend", locationList.toString());
+            }
+        });
+    }
+
+    private void sendAllLocationsToServer() {
+        HttpUtils.postAllLocations(getApplicationContext(), user, locationList, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Toast.makeText(getApplicationContext(), "Locations not saved", Toast.LENGTH_SHORT).show();
+                Log.d("locsend", "fail - locs add");
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Toast.makeText(getApplicationContext(), "Locations saved", Toast.LENGTH_SHORT).show();
+                locationList.clear();
+                tinyDB.putListObject("locations", locationList);
             }
         });
     }

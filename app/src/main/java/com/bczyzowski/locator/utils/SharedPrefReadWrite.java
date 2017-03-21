@@ -57,7 +57,7 @@ public class SharedPrefReadWrite {
         editor.putString("longitude",String.valueOf(location.getLongitude()));
         editor.putString("accuracy",String.valueOf(location.getAccuracy()));
         editor.putString("time",location.getTime().toString());
-        editor.apply();
+        editor.commit();
     }
 
     public static Location getLastLocToSharedPref(Context context) {

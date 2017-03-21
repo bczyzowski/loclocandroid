@@ -1,16 +1,19 @@
 package com.bczyzowski.locator.services;
 
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 
 import com.bczyzowski.locator.R;
@@ -52,7 +55,7 @@ public class GpsService extends Service {
                 Intent intent = new Intent("locationUpdate");
                 sendBroadcast(intent);
 
-                Intent locServiceIntent = new Intent(getBaseContext(),LocationSenderService.class);
+                Intent locServiceIntent = new Intent(getBaseContext(), LocationSenderService.class);
                 locServiceIntent.putExtra("loc", loc);
                 startService(locServiceIntent);
             }
@@ -76,6 +79,9 @@ public class GpsService extends Service {
         };
 
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, locTimeInterval, 3, locationListener);
 
 
@@ -99,6 +105,9 @@ public class GpsService extends Service {
     public void onDestroy() {
         super.onDestroy();
         if (locationManager != null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
             locationManager.removeUpdates(locationListener);
         }
     }
