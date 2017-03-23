@@ -37,7 +37,6 @@ public class HistoryActivity extends FragmentActivity implements OnMapReadyCallb
         friendsNames.add(0, userEmail + " (me)");
         token = getIntent().getExtras().getString("token");
 
-        //wywolanie dateDialog w friendPickerDial
         showFriendPickerDialog(friendsNames);
     }
 

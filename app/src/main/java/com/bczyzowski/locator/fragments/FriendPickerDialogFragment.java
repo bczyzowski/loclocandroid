@@ -40,7 +40,7 @@ public class FriendPickerDialogFragment extends DialogFragment {
                             user = user.substring(0, user.lastIndexOf("("));
                         }
                         chosenFriend = user;
-                        // uzytkownik zostal wybrany - > pokaz dateDialog
+                        // user chosed - > show dateDialog
                         showDatePickerDialog();
                     }
                 });

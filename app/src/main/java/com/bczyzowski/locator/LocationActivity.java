@@ -14,6 +14,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -68,7 +69,7 @@ public class LocationActivity extends AppCompatActivity
     private List<String> friendsNames = new ArrayList<>();
     private List<Location> friendsLocations = new ArrayList<>();
 
-    private String lastUserFocused; // glowny uzytkownik = null, lub email danego przyjaciela
+    private String lastUserFocused; // main user = null, or friend email
 
     private boolean isMyLocationFocused = true;
     private Location lastUserLocation;
@@ -284,7 +285,6 @@ public class LocationActivity extends AppCompatActivity
     private void updateUserFriendsList() {
         friendsNames.clear();
         friendsLocations.clear();
-
         HttpUtils.getUserFriends(this, user, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -348,6 +348,9 @@ public class LocationActivity extends AppCompatActivity
         };
 
         if (mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
             mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, actualListener);
         }
         isMyLocationFocused = true;
@@ -363,6 +366,7 @@ public class LocationActivity extends AppCompatActivity
 
     private void createFriendsSubmenu() {
         int index = 0;
+        navigationView.getMenu().clear();
         for (String name : friendsNames) {
             navigationView.getMenu().add(0, index++, Menu.NONE, name);
 

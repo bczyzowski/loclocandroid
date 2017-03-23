@@ -45,7 +45,7 @@ public class DatePickerDialogFragment extends DialogFragment implements DatePick
 
     @Override
     public void onDateSet(android.widget.DatePicker datePicker, int year, int month, int day) {
-        getHistory(chosenFriend, day, month + 1, year); // num miesiecy od 0
+        getHistory(chosenFriend, day, month + 1, year); // months start from 0
     }
     public void getHistory(String friendEmail, int day, int month, int year) {
         HttpUtils.retrieveHistory(getActivity(), userEmail, friendEmail, token, day, month, year, new JsonHttpResponseHandler() {

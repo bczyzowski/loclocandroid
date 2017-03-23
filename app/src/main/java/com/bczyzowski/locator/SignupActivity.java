@@ -54,8 +54,6 @@ public class SignupActivity extends Activity {
     }
 
     private void signup() {
-
-
         Log.d(TAG, "Signup");
 
         if (validateInputData()) {

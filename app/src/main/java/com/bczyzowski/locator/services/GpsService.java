@@ -49,7 +49,6 @@ public class GpsService extends Service {
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                System.out.println("Zmiana lokalizacji " + location.getLongitude() + " " + location.getLatitude());
                 com.bczyzowski.locator.model.Location loc = new com.bczyzowski.locator.model.Location(location.getLatitude(), location.getLongitude(), location.getAccuracy(), LocalDateTime.now());
                 SharedPrefReadWrite.saveLastLocToSharedPref(loc, getApplicationContext());
                 Intent intent = new Intent("locationUpdate");

@@ -51,7 +51,7 @@ public class LocationPickerDialogFragment extends DialogFragment {
                 .setItems(locations, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
-                            // pokaz wszystkie lokalizacje
+                            // show all loc
                             PolylineOptions polylineOptions = createPolylineOptFromAllLocations(retrievedLocations);
                             List<MarkerOptions> markers = createMarkersFromAllLocations(retrievedLocations);
                             HistoryActivity.addPolylineToMap(polylineOptions, markers);
